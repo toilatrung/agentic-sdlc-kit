@@ -123,13 +123,10 @@ EXPECTED_ENUM_LINES = {
     ],
 }
 
-REQUIRED_PATHS = {
+COMMON_REQUIRED_PATHS = {
     "AGENT.md",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md",
-    "CONTRIBUTING.md",
     "docs/00-project/release-notes-v1.0.0.md",
+    "docs/00-project/installation.md",
     ".agent/planning/roadmap.md",
     ".agent/planning/milestones.md",
     ".agent/planning/epics.md",
@@ -138,6 +135,63 @@ REQUIRED_PATHS = {
     ".agent/execution/task-board.md",
     ".agent/execution/sessions-history.md",
 }
+
+DISTRIBUTION_REQUIRED_PATHS = {
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "scripts/install-kit.sh",
+    "scripts/install-kit.ps1",
+}
+
+OVERLAY_REQUIRED_PATHS = {
+    "AGENTIC-SDLC-KIT.md",
+    "LICENSE.agentic-sdlc-kit",
+}
+
+OVERLAY_DOCUMENTS = {
+    "AGENT.md",
+    "AGENTIC-SDLC-KIT.md",
+    "docs/00-project/index.md",
+    "docs/00-project/installation.md",
+    "docs/00-project/release-notes-v1.0.0.md",
+    "docs/01-business/index.md",
+    "docs/01-business/srs.md",
+    "docs/02-architecture/architecture.md",
+    "docs/02-architecture/index.md",
+    "docs/03-domain/index.md",
+    "docs/04-api/contract.md",
+    "docs/04-api/index.md",
+    "docs/05-database/index.md",
+    "docs/06-security/index.md",
+    "docs/07-development/index.md",
+    "docs/08-devops/index.md",
+    "docs/09-testing/index.md",
+    "docs/10-agents/index.md",
+    "docs/11-integrations/index.md",
+    "docs/12-ai/index.md",
+    "docs/13-observability/index.md",
+} | {f"docs/10-agents/{name}" for name in REQUIRED_PROMPTS}
+
+OVERLAY_AGENT_DOCUMENTS = {
+    ".agent/execution/current-context.md",
+    ".agent/execution/sessions-history.md",
+    ".agent/execution/task-board.md",
+    ".agent/planning/dependency-graph.md",
+    ".agent/planning/epics.md",
+    ".agent/planning/milestones.md",
+    ".agent/planning/roadmap.md",
+    ".agent/intelligence/code-graph/api-routes.md",
+    ".agent/intelligence/code-graph/database-usage.md",
+    ".agent/intelligence/code-graph/dependencies.md",
+    ".agent/intelligence/code-graph/function-map.md",
+    ".agent/intelligence/code-graph/modules.md",
+    ".agent/intelligence/git-nexus/commit-map.md",
+    ".agent/intelligence/git-nexus/decision-commit-map.md",
+    ".agent/intelligence/git-nexus/regression-log.md",
+    ".agent/intelligence/git-nexus/task-commit-map.md",
+} | {f".agent/templates/{name}" for name in REQUIRED_TEMPLATES}
 
 
 @dataclass(frozen=True)
@@ -150,6 +204,7 @@ class Finding:
 class Validator:
     def __init__(self, root: Path) -> None:
         self.root = root
+        self.overlay_mode = (root / "AGENTIC-SDLC-KIT.md").exists()
         self.findings: list[Finding] = []
         self.metadata: dict[Path, dict[str, str]] = {}
 
@@ -164,6 +219,13 @@ class Validator:
         self.findings.append(Finding(code, display, message))
 
     def markdown_files(self) -> list[Path]:
+        if self.overlay_mode:
+            files = {self.root / relative for relative in OVERLAY_DOCUMENTS | OVERLAY_AGENT_DOCUMENTS}
+            for runtime_relative in (".agent/governance", ".agent/reports"):
+                runtime_root = self.root / runtime_relative
+                if runtime_root.exists():
+                    files.update(runtime_root.rglob("*.md"))
+            return sorted(path for path in files if path.exists())
         return sorted(
             path
             for path in self.root.rglob("*.md")
@@ -184,7 +246,8 @@ class Validator:
         return match.group(1).strip() if match else None
 
     def validate_required_paths(self) -> None:
-        for relative in sorted(REQUIRED_PATHS):
+        required = COMMON_REQUIRED_PATHS | (OVERLAY_REQUIRED_PATHS if self.overlay_mode else DISTRIBUTION_REQUIRED_PATHS)
+        for relative in sorted(required):
             if not (self.root / relative).exists():
                 self.error("MISSING_REQUIRED_PATH", relative, "required packaging or operating asset is missing")
 
@@ -264,7 +327,7 @@ class Validator:
             for heading in sorted(missing):
                 self.error("TEMPLATE_HEADING_MISSING", path, f"required stable heading is missing: {heading}")
 
-        for path in self.root.rglob("*template*.md"):
+        for path in (path for path in self.markdown_files() if "template" in path.name.lower()):
             if path.parent != directory:
                 self.error("TEMPLATE_PLACEMENT_INVALID", path, "reusable templates must be stored in .agent/templates")
 
@@ -393,7 +456,7 @@ class Validator:
             self.error("DEPENDENCY_CYCLE", path, "active dependency graph contains a directed cycle")
 
     def validate_packaging_contract(self) -> None:
-        readme = self.root / "README.md"
+        readme = self.root / ("AGENTIC-SDLC-KIT.md" if self.overlay_mode else "README.md")
         required_readme_headings = {
             "Core Concepts",
             "Folder Structure",

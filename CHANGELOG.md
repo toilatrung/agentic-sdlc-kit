@@ -21,6 +21,7 @@ All notable framework changes are recorded in this file. The format follows Keep
 - Project onboarding workflow for SRS, contract, and architecture inputs.
 - Agent prompt pack for bootstrap through release management.
 - Standard-library framework validator and v1.0.0 release audit assets.
+- Bash and PowerShell overlay installers with collision backups and overlay-aware validation.
 
 ### Changed
 

@@ -29,7 +29,7 @@ Record the repository health audit and release-readiness decision for the Agenti
 
 - **Included Epics or Tasks**: `framework packaging phase`
 - **Included Commits**: `none; repository is not connected to an accessible Git worktree`
-- **Included Artifacts**: `operating policy, planning and execution registries, governance and report model, 12 templates, 8 prompts, validator, packaging documents, and v1.0.0 release notes`
+- **Included Artifacts**: `operating policy, planning and execution registries, governance and report model, 12 templates, 8 prompts, overlay installers, validator, packaging documents, and v1.0.0 release notes`
 - **Excluded or Deferred Items**: `application source, project tests, deployment infrastructure, and unresolved onboarded-project inputs`
 
 ## Related Files
@@ -52,6 +52,7 @@ Record the repository health audit and release-readiness decision for the Agenti
 - [x] Internal Markdown links resolve.
 - [x] Dependency graph contains no self-reference or directed cycle.
 - [x] `scripts/validate-framework.py` executed successfully and printed `FRAMEWORK_VALIDATION_PASS`.
+- [x] Bash and PowerShell overlay installers preserve project-owned root and protected directories and back up collisions.
 
 ## Audit Findings
 
@@ -64,7 +65,7 @@ No critical, major, or minor framework findings remain open.
 
 ## Deployment Plan
 
-- **Procedure Path**: `Publish the repository at tag v1.0.0 after creating a Git worktree and verifying the release commit.`
+- **Procedure Path**: `Validate cloned-distribution and overlay installation modes, then publish the repository at tag v1.0.0 after creating a Git worktree and verifying the release commit.`
 - **Responsible Owner**: `release-manager`
 - **Start Criteria**: `FRAMEWORK_VALIDATION_PASS and approved publication authority`
 - **Success Criteria**: `v1.0.0 tag and distributable repository contain the audited artifact set`

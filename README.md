@@ -105,7 +105,7 @@ Reusable templates remain in `.agent/templates/`. Baselined requirements, contra
 
 ## Quick Start
 
-1. Copy or clone the kit into a new repository.
+1. Clone the kit or follow [the overlay installation guide](docs/00-project/installation.md) for an existing project.
 2. Run `python scripts/validate-framework.py`.
 3. Read `AGENT.md` as the authoritative operating policy.
 4. Use `docs/10-agents/project-bootstrap-prompt.md` to verify the framework installation.
@@ -142,6 +142,22 @@ python scripts/validate-framework.py
 
 The validator checks metadata, duplicate IDs, internal links, templates, lifecycle states, folder placement, prompt contracts, and governance/report separation.
 
+## Installation
+
+Install into an existing project without replacing its README, license, package files, source, tests, or infrastructure:
+
+```bash
+git clone https://github.com/toilatrung/agentic-sdlc-kit.git
+cd agentic-sdlc-kit
+./scripts/install-kit.sh /path/to/project
+```
+
+```powershell
+.\scripts\install-kit.ps1 -TargetProjectPath C:\path\to\existing-project
+```
+
+The overlay guide is copied as `AGENTIC-SDLC-KIT.md`, and the kit license is copied as `LICENSE.agentic-sdlc-kit`. Existing overlay destinations are backed up before replacement.
+
 ## Contributing and License
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md), and [LICENSE](LICENSE).
+The cloned distribution includes `CONTRIBUTING.md`, `CHANGELOG.md`, and the MIT `LICENSE`. Overlay installation deliberately omits the changelog and contribution guide, renames the kit license, and preserves the target project's own root files.

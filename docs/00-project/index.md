@@ -15,6 +15,7 @@ Index framework identity, release, charter, stakeholder, and terminology documen
 
 ## Contents
 
+- `installation.md` - Clone and existing-project overlay installation guidance
 - `release-notes-v1.0.0.md` - Agentic SDLC Kit v1.0.0 release notes
 - `charter.md` - Project charter when supplied by an onboarded project
 - `stakeholders.md` - Stakeholder registry when supplied by an onboarded project

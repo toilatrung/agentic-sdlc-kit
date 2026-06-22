@@ -41,6 +41,10 @@ Context retrieval is task-driven with no fixed required reading order. Metadata 
 
 The onboarding workflow ingests authoritative SRS, contract, and architecture inputs, validates metadata and completeness, creates blockers instead of guessing, and builds only the initial Roadmap -> Milestone -> Epic hierarchy.
 
+## Installation
+
+Bash and PowerShell overlay installers copy only framework-owned assets into an existing project. Existing destinations are backed up with the `.backup-agentic-sdlc-kit` suffix, while project README, license, package files, source, tests, and infrastructure remain untouched.
+
 ## Validation
 
 Run `python scripts/validate-framework.py`. A releasable framework emits `FRAMEWORK_VALIDATION_PASS`.
