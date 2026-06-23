@@ -11,16 +11,17 @@ priority: 3
 
 ## Usage Purpose
 
-Use this template to record executed quality checks, results, defects, and a release-readiness recommendation.
+Use this template to record QA Agent checks, results, defects, and completion recommendation after independent review approval.
 
 ## Record Metadata
 
-- **Report ID**: `QA-<number>`
+- **Report ID**: `TASK-ID`
 - **Title**: `<required>`
 - **Owner**: `<required-person-or-agent-id>`
 - **Tester**: `<required-person-or-agent-id>`
 - **Status**: `draft | passed | failed | blocked | superseded`
-- **Task or Epic IDs**: `<ids>`
+- **Task ID**: `TASK-ID`
+- **Review Decision**: `APPROVED`
 - **Test Date**: `YYYY-MM-DD`
 - **Environment ID**: `<environment-name-or-id>`
 
@@ -28,15 +29,28 @@ Use this template to record executed quality checks, results, defects, and a rel
 
 - **Features or Requirements**: `<ids-or-descriptions>`
 - **Included Test Levels**: `unit | integration | contract | end-to-end | security | performance | manual`
+- **Behavior Checks**: `<checks-or-none>`
+- **Edge Cases**: `<checks-or-none>`
+- **Regression Checklist**: `<path-or-inline-checklist>`
 - **Excluded Checks**: `<checks-and-reasons-or-none>`
 
 ## Related Files
 
 - **Test Plan or Strategy**: `<paths>`
-- **Implementation Reports**: `<paths>`
-- **Review Reports**: `<paths-or-none>`
+- **Implementation Report**: `.agent/reports/implementation/TASK-ID.md`
+- **Review Report**: `.agent/reports/review/TASK-ID.md`
+- **Task Board**: `.agent/execution/task-board.md`
+- **Current Context**: `.agent/execution/current-context.md`
 - **Issues or Risks**: `<paths-or-none>`
 - **Build or Commit**: `<identifier>`
+
+## Command Evidence
+
+| Command | Result | Evidence |
+|---|---|---|
+| `agent qa start TASK-ID` | `passed | failed | not-run` | `<output-or-path>` |
+| `agent qa pass TASK-ID` | `passed | failed | not-run` | `<output-or-path>` |
+| `agent qa fail TASK-ID` | `passed | failed | not-run` | `<output-or-path>` |
 
 ## Test Results
 
@@ -60,10 +74,12 @@ Use this template to record executed quality checks, results, defects, and a rel
 
 ## Acceptance Criteria
 
+- [ ] Review report records `APPROVED` before QA starts.
 - [ ] Every required check has a result and evidence.
 - [ ] Result totals reconcile with the results table.
 - [ ] Failed checks map to issue records.
 - [ ] Skipped checks include an explicit approved reason.
+- [ ] Behavior, edge cases, regression checklist, and manual verification are recorded when applicable.
 
 ## Release Recommendation
 
@@ -80,13 +96,16 @@ Use this template to record executed quality checks, results, defects, and a rel
 
 ## Forbidden Actions
 
+- Do not start QA before independent review is `APPROVED`.
 - Do not mark status `passed` with unresolved required failures.
 - Do not omit, relabel, or discard failed results.
 - Do not count unexecuted checks as passed.
+- Do not replace independent review with QA.
+- Do not change roadmap or acceptance criteria.
 - Do not expose secrets or production personal data in evidence.
 
 ## Output Requirements
 
-- Save as `.agent/reports/qa/QA-<number>.md`.
+- Save as `.agent/reports/qa/TASK-ID.md`.
 - Preserve every heading and table column in this template.
 - Use exact enum values and non-negative integer totals.
