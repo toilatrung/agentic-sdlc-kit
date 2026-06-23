@@ -473,6 +473,41 @@ class Validator:
             for heading in sorted(missing):
                 self.error("README_SECTION_MISSING", readme, f"required packaging section is missing: {heading}")
 
+    def validate_installer_contract(self) -> None:
+        installer_paths = [self.root / "scripts" / "install-kit.ps1", self.root / "scripts" / "install-kit.sh"]
+        whole_agent_patterns = [
+            r"Copy-DirectoryAsset\s+-SourceRelative\s+['\"]\.agent['\"]\s+-DestinationRelative\s+['\"]\.agent['\"]",
+            r"copy_directory_asset\s+['\"]\.agent['\"]\s+['\"]\.agent['\"]",
+            r"cp\s+-a\s+['\"]?\$KIT_ROOT/\.agent",
+            r"Copy-Item\b[^\n\r]+\.agent\b[^\n\r]+-Recurse",
+        ]
+        runtime_record_patterns = [
+            r"\.agent[/\\]reports[/\\][^\n\r'\"\s]+\.md",
+            r"\.agent[/\\]governance[/\\][^\n\r'\"\s]+\.md",
+            r"Copy-DirectoryAsset\s+-SourceRelative\s+['\"]\.agent[/\\]reports",
+            r"Copy-DirectoryAsset\s+-SourceRelative\s+['\"]\.agent[/\\]governance",
+            r"copy_directory_asset\s+['\"]\.agent[/\\]reports",
+            r"copy_directory_asset\s+['\"]\.agent[/\\]governance",
+        ]
+        for path in installer_paths:
+            if not path.exists():
+                continue
+            text = self.read(path)
+            for pattern in whole_agent_patterns:
+                if re.search(pattern, text):
+                    self.error(
+                        "INSTALLER_WHOLE_AGENT_COPY",
+                        path,
+                        "installer must not copy the entire .agent directory; copy reusable assets and initialize clean runtime state",
+                    )
+            for pattern in runtime_record_patterns:
+                if re.search(pattern, text):
+                    self.error(
+                        "INSTALLER_RUNTIME_RECORD_COPY",
+                        path,
+                        "installer must not copy runtime .agent/reports or .agent/governance Markdown records",
+                    )
+
     def run(self) -> list[Finding]:
         self.validate_required_paths()
         self.validate_frontmatter()
@@ -484,6 +519,7 @@ class Validator:
         self.validate_lifecycle_consistency()
         self.validate_dependencies()
         self.validate_packaging_contract()
+        self.validate_installer_contract()
         return sorted(self.findings, key=lambda item: (item.path, item.code, item.message))
 
 
